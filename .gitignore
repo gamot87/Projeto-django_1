@@ -128,3 +128,7 @@ gunicorn-error-log
 db.sqlite3
 db copy.sqlite3
 static/
+
+# Add again for course purpose -- permite enviar nosso banco de dados pro git o que Não é comum mas para a proposta do curso 
+#enviaremos 
+!db.sqlite3
