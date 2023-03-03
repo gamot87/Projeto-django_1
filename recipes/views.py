@@ -7,4 +7,4 @@ from django.shortcuts import render
 def home(request):
     # home.html = arquivo html que o django a
     # utomaticamente irá procurar na pasta templates
-    return render(request, 'recipes/home.html', context={'name': 'Gabriel'})
+    return render(request, 'recipes/pages/home.html', context={'name': 'Gabriel'})
