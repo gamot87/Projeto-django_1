@@ -1,0 +1,13 @@
+{% include 'recipes/partials/head.html' %} <!--Puxa o conteudo do arquivo 
+    head.html e usa nesse arquivo-->
+    <body>
+        {% include 'recipes/partials/header.html' %}
+        {% include 'recipes/partials/search.html' %} 
+        <!--Main signidica o conteúdo principal -->
+        <main class="main-content-container">
+            {% block content %}{% endblock  %}
+        </main>
+        {% include 'recipes/partials/footer.html' %}
+    </body>
+    
+    </html>
