@@ -1,18 +1,12 @@
-{% include 'recipes/partials/head.html' %} <!--Puxa o conteudo do arquivo 
-head.html e usa nesse arquivo-->
-<body>
-    {% include 'recipes/partials/header.html' %}
-    {% include 'recipes/partials/search.html' %} 
-    <!--Main signidica o conteúdo principal -->
-    <main class="main-content-container">
-        <div class="main-content main-content-list container">
-            {% include 'recipes/partials/recipes.html' %}
-            {% include 'recipes/partials/recipes.html' %}
-            
-            
-        </div>
-    </main>
-    {% include 'recipes/partials/footer.html' %}
-</body>
+{% extends 'global/base.html' %} <!-- usamos a pargina mãe base.html e apenar incluimos o conteudo abaixo-->
+{% block title %}Home | {% endblock title %} 
 
-</html>
+{% block content %}
+<div class="main-content main-content-list container">
+    {% for recipe in recipes  %}
+        {% include 'recipes/partials/recipe.html' %}
+    {% endfor %}       
+       
+</div>
+{% endblock content %}
+  

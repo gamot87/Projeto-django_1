@@ -7,12 +7,14 @@ from . import views
 
 # from recipes.views import home
 
+# o codigo abaixo inicia a variavel name abaixo recipes:recipe
+app_name = 'recipes'
 
 urlpatterns = [
-    path('', views.home),
+    path('', views.home, name='home'),
     # <id> é uma variável para indicar o valor que será inserido no caminho da
     # url para identificar cada receita individualmente
     # bem como é um parametro recebido pela função recipe
     # int: -- só aceita inteiros
-    path('recipes/<int:id>/', views.recipe),
+    path('recipes/<int:id>/', views.recipe, name='recipe'),
 ]
