@@ -46,7 +46,10 @@ class Recipe(models.Model):
     # o campo será preenchido com valores nulos.
     # null=True significa que pode receber valores nulos.
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True
+        Category, on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
     )
     # Abaixo a coluna author recebe o nome de usuario automaticamente
     author = models.ForeignKey(
