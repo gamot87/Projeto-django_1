@@ -2,10 +2,11 @@
 
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 
-from utils.recipes.factory import make_recipe
-
 # abaixo estamos importando a função que salva os dados no banco de dados
 from .models import Recipe
+
+# from utils.recipes.factory import make_recipe
+
 
 # Create your views here.
 
@@ -40,7 +41,7 @@ def category(request, category_id):
     #                       'name',
     #                        'Not found'
     #                        ) 'title': f'{category_name}
-    # como eh uma query usamos 'title': f'{recipes.first().category.name} - Category | '
+    # como eh uma query usamos 'title': f'{recipes.first().category.name} - Category | # noqa:E501
     # if not recipes:
     # raise Http404('Not Found')
 
@@ -49,6 +50,7 @@ def category(request, category_id):
             category__id=category_id,
             is_published=True,
         ).order_by('-id'))
+    # filtrando
     # como é uma lista usamos o indice
     # 'title': f'{recipes[0].category.name} - Category | '
 
