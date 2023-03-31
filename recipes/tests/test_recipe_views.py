@@ -46,7 +46,7 @@ class RecipeViewsTest(RecipeTestBase):
         # Podemos usar o self.fail para nos lembrar de terminar de digitar um codigo # noqa:E501
         # self.fail('Para que eu termine de digitá-lo')
 
-    def teste_recipe_home_template_loads_recipes(self):
+    def test_recipe_home_template_loads_recipes(self):
         # Testa se existe uma receita
         # Vamos chamar o metodo herdado de test_rtecipe_base que cria uma receita: # noqa:E501
         self.make_recipe(author_data={
@@ -73,6 +73,16 @@ class RecipeViewsTest(RecipeTestBase):
         # Testando se temos somente uma receita , para ter certeza que ela foi criada e exibida # noqa:E501
         self.assertEqual(len(response_recipes), 1)
 
+    def test_recipe_home_template_dont_load_recipes_not_published(self):
+        # test if recipe is_published = False dont show
+        self.make_recipe(is_published=False)
+        response = self.client.get(reverse('recipes:home'))
+
+        self.assertIn(
+            '<h1>No recipes found here</h1>',
+            response.content.decode('utf-8')
+        )
+
     def test_recipe_category_view_functions_is_correct(self):
         view = resolve(reverse('recipes:category',
                        kwargs={'category_id': 10000}))
@@ -87,6 +97,26 @@ class RecipeViewsTest(RecipeTestBase):
         # na linha abaixo e verificar em depurar (3 icone de cima para baixo, apos a lupa) quais propiedades a variavel tem # noqa:E501
         self.assertEqual(response.status_code, 404)
 
+    def teste_recipe_Category_template_loads_recipes(self):
+        # Testa se existe uma category
+        needed_title = 'this is a category test'
+        self.make_recipe(title=needed_title)  # mudamos o title para testar se ele gera um igual # noqa:E501
+        response = self.client.get(reverse('recipes:category', kwargs={
+            'category_id': 1
+        }
+        ))
+        content = response.content.decode('utf-8')
+        self.assertIn(needed_title,
+                      content)
+
+    def test_recipe_category_template_dont_load_recipes_not_published(self):
+        # test if recipe is_published = False dont show
+        recipe = self.make_recipe(is_published=False)
+        response = self.client.get(
+            reverse('recipes:recipe', kwargs={'id': recipe.category.id}))
+
+        self.assertEqual(response.status_code, 404)
+
     def test_recipe_detail_view_functions_is_correct(self):
         view = resolve(reverse('recipes:recipe', kwargs={'id': 1}))
         # estamos perguntando de view.func é = views.home
@@ -98,4 +128,25 @@ class RecipeViewsTest(RecipeTestBase):
             reverse('recipes:recipe', kwargs={'id': 10000}))
         # status_code é uma informação que temos na variavel response, ela pode ser verificada fazendo o debug com break point # noqa:E501
         # na linha abaixo e verificar em depurar (3 icone de cima para baixo, apos a lupa) quais propiedades a variavel tem # noqa:E501
+        self.assertEqual(response.status_code, 404)
+
+    def test_recipe_detail_template_loads_the_correct_recipe(self):
+        # Testa se existe uma pagina de recipe details (detalhes)
+        needed_title = 'this is a detail page - it load one recipe'
+        # need a recipe for this test
+        self.make_recipe(title=needed_title)  # mudamos o title para testar se ele gera um igual # noqa:E501
+        response = self.client.get(reverse(
+            'recipes:recipe',
+            kwargs={'id': 1}))
+        content = response.content.decode('utf-8')
+        # check
+        self.assertIn(needed_title,
+                      content)
+
+    def test_recipe_detail_template_dont_load_recipe_not_published(self):
+        # test if recipe is_published = False dont show
+        recipe = self.make_recipe(is_published=False)
+        response = self.client.get(
+            reverse('recipes:recipe', kwargs={'id': recipe.id}))  # ou recipe.pk # noqa:E501
+
         self.assertEqual(response.status_code, 404)
