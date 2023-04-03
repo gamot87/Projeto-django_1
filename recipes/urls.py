@@ -16,8 +16,10 @@ urlpatterns = [
     # url para identificar cada receita individualmente
     # bem como é um parametro recebido pela função recipe
     # int: -- só aceita inteiros
+    path('recipes/search/', views.search, name='search'),  # lambda é temporario para que a url exista e passe no teste # noqa : E501
     path('recipes/category/<int:category_id>/',
          views.category, name='category'),
     path('recipes/<int:id>/', views.recipe, name='recipe'),
+
 
 ]

@@ -1,5 +1,6 @@
 # from django.http import HttpResponse
 
+from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 
 # abaixo estamos importando a função que salva os dados no banco de dados
@@ -70,3 +71,15 @@ def recipe(request, id):
                   context={'recipe': recipe,
                            'is_detail_page': True
                            })
+
+
+def search(request):
+    # vamos capturar o valor (q) digitado no input do search
+    # caso nao tenha valor ele retorna None
+    search_term = request.GET.get('q')
+    # vamos condicionar para caso o usuario nao digite nada
+    # a view faça uma ação
+    if not search_term:  # se nao tiver nada em search_term subir um erro 404
+        raise Http404()
+
+    return render(request, 'recipes/pages/search.html')

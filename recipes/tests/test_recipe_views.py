@@ -150,3 +150,21 @@ class RecipeViewsTest(RecipeTestBase):
             reverse('recipes:recipe', kwargs={'id': recipe.id}))  # ou recipe.pk # noqa:E501
 
         self.assertEqual(response.status_code, 404)
+
+    def test_recipe_search_uses_correct_view_function(self):
+        resolved = resolve(reverse('recipes:search'))
+        self.assertIs(resolved.func, views.search)
+
+    def test_recipe_search_loads_correct_template(self):
+        # o teste abaixo quebrou esse teste pois a view estava subindo o erro 404 caso o valor colocado fosse vazio # noqa:E501
+        # então para que o teste volte  funcionar adicionamos a url o valor de um imput('?q=teste') # noqa:E501
+        # assim ele renderiza o template apontado na view
+        url = reverse('recipes:search') + '?q=teste'
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'recipes/pages/search.html')
+
+    def test_recipe_search_raises_404_if_no_search_term(self):
+        # url = reverse('recipes:search') + '?q=teste' ->>> para testar basta colocar essa variavel url no lugar de # noqa:E501
+        # 'recipes:search' pois o valor seria 200 e ai nao passaria
+        response = self.client.get(reverse('recipes:search'))
+        self.assertEqual(response.status_code, 404)

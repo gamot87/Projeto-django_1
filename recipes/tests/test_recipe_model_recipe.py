@@ -30,7 +30,7 @@ class RecipeModelTest(RecipeTestBase):
                     ),
             title='Recipe Title',
             description='Recipe Description',
-            slug='recipe-slug',
+            slug='recipe-slug-for-no-defaults',
             preparation_time=10,
             preparation_time_unit='Minutos',
             servings=3,
@@ -65,3 +65,14 @@ class RecipeModelTest(RecipeTestBase):
             recipe.is_published,
             msg='Recipe is_published is not False'
         )
+
+    def test_recipe_string_representation(self):  # Vamos testar se def __str__(self): retorna return self.title # noqa:E501
+        self.recipe.title = 'Testing Represetation'  # alteramos o titulo e vamos testar se ele vai retornar esse exato titulo # noqa:E501
+        self.recipe.full_clean()  # fazendo validações
+        self.recipe.save()  # salvando a alteração do titulo
+        self.assertEqual(
+            str(self.recipe),
+            'Testing Represetation',
+            msg=f'Recipe string representation must be equals to "Testing Represetation" but "{self.recipe.title}" was received'  # noqa:E501
+            )  # testando se o titulo te o mesmo valor do titulo que alteramos na primeira linha de codigo # noqa:E501
+        # uso "" na variavel para que percebamos pequenos detalhes diferentes como por exemplo um espaço a mais ou a menos # noqa:E501
