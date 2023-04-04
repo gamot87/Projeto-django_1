@@ -1,1 +1,17 @@
-{% extends 'global/base.html' %}
+{% extends 'global/base.html' %} <!-- usamos a pargina mãe base.html e apenar incluimos o conteudo abaixo-->
+{% block title %}{{ page_title }}{% endblock title %} 
+
+{% block content %}
+
+<div class="main-content main-content-list container">
+    {% for  recipe in recipes %}
+        {% include 'recipes/partials/recipe.html' %}
+    {% empty %}
+        <div class="center m-y" >
+            <h1>No recipes found here</h1>
+        </div>
+    {% endfor %}   
+       
+</div>
+{% endblock content %}
+  
