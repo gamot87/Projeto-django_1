@@ -1,9 +1,13 @@
 # from django.http import HttpResponse
 
-from django.db.models import \
-    Q  # Para indicar o django que queremos OR ao inves de AND
+# modulo de paginação do django
+from django.core.paginator import Paginator
+# Para indicar o django que queremos OR ao inves de AND
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404, render
+
+from utils.pagination import make_pagination_range
 
 # abaixo estamos importando a função que salva os dados no banco de dados
 from .models import Recipe
@@ -15,9 +19,9 @@ from .models import Recipe
 
 
 def home(request):
-    # Abaixo estamos criando uma variavel com o comando sheel que
-    # vai relacionar todas as receitas em ordem decrescente
-    # ou seja quanto mais recente primeiro sera relacionada
+    # Abaixo estamos criando uma variavel com o comando sheel que vai filtrar as receitar de  # noqa:E501
+    # acordo com a variavel is_published e listar todas em ordem decrescente ou seja quanto  # noqa:E501
+    # mais recente primeiro sera relacionada
     # recipes = Recipe.objects.filter(
     # is_published=True
     # ).order_by('-id')
@@ -28,8 +32,26 @@ def home(request):
         is_published=True,
     ).order_by('-id')
 
+    try:
+        current_page = int(request.GET.get('page', 1))  # <-pega a query string, se nao tiver nada ele pega a página 1 # noqa:E501
+        # e transforma ela em inteiro caso ela seja lida como string
+    except ValueError:
+        current_page = 1
+
+    # vamos criar um objeto Paginator e como argumentos usamos a variabel recipes (que filtrou)  # noqa:E501
+    # resultados especificos e a quantidade de receitas por pagina paginas
+    paginator = Paginator(recipes, 9)
+    page_obj = paginator.get_page(current_page)
+
+    # Vamos criar uma variacel
+    pagination_range = make_pagination_range(
+        paginator.page_range,
+        4,
+        current_page=current_page,
+    )
     return render(request, 'recipes/pages/home.html',
-                  context={'recipes': recipes,
+                  context={'recipes': page_obj,
+                           'pagination_range': pagination_range,
                            })
 
 

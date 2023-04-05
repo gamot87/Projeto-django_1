@@ -1,0 +1,19 @@
+{% if recipes.has_other_pages %}
+    <div class="container paginator">
+         <div class="pagination_content">
+            {% if pagination_range.first_page_out_of_range %}
+                <a class="page-link page-item" href="?page=1">1</a>
+                <span class="page-item">...</span>
+            {% endif %}   
+        <!--pagination_range é uma variavel que está descrita no render(context) da view que retorna valores
+        um dele é pagination que consiste de uma lista com 4 numeros crescentes, no caso as páginas enumeradas -->
+            {% for page in pagination_range.pagination %} <!--Para cada numero de pagina geramos um link-->
+                <a class="page-link page-item" href="?page={{ page }}">{{ page }}</a>
+                {% endfor %}
+            {% if pagination_range.last_page_out_of_range %}
+                <span class="page-item">...</span>
+                <a class="page-link page-item" href="?page={{ pagination_range.total_pages }}">{{ pagination_range.total_pages }}</a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
