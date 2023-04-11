@@ -1,13 +1,15 @@
 # from django.http import HttpResponse
 
 # modulo de paginação do django
-from django.core.paginator import Paginator
+# from django.core.paginator import Paginator
 # Para indicar o django que queremos OR ao inves de AND
+import os  # Para permitir o uso de variaveis de ambiente
+
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 
-from utils.pagination import make_pagination_range
+from utils.pagination import make_pagination
 
 # abaixo estamos importando a função que salva os dados no banco de dados
 from .models import Recipe
@@ -16,6 +18,9 @@ from .models import Recipe
 
 
 # Create your views here.
+# Pegamos o valor da variavel de ambiente usando o modulo os e utilizando o nome da variavel # noqa:E501
+# e se nao tiver nenhum valor usamos 6 como padrão
+PER_PAGE = int(os.environ.get('PER_PAGE', 6))
 
 
 def home(request):
@@ -31,24 +36,7 @@ def home(request):
     recipes = Recipe.objects.filter(
         is_published=True,
     ).order_by('-id')
-
-    try:
-        current_page = int(request.GET.get('page', 1))  # <-pega a query string, se nao tiver nada ele pega a página 1 # noqa:E501
-        # e transforma ela em inteiro caso ela seja lida como string
-    except ValueError:
-        current_page = 1
-
-    # vamos criar um objeto Paginator e como argumentos usamos a variabel recipes (que filtrou)  # noqa:E501
-    # resultados especificos e a quantidade de receitas por pagina paginas
-    paginator = Paginator(recipes, 9)
-    page_obj = paginator.get_page(current_page)
-
-    # Vamos criar uma variacel
-    pagination_range = make_pagination_range(
-        paginator.page_range,
-        4,
-        current_page=current_page,
-    )
+    page_obj, pagination_range = make_pagination(request, recipes, PER_PAGE)
     return render(request, 'recipes/pages/home.html',
                   context={'recipes': page_obj,
                            'pagination_range': pagination_range,
@@ -78,9 +66,10 @@ def category(request, category_id):
     # filtrando
     # como é uma lista usamos o indice
     # 'title': f'{recipes[0].category.name} - Category | '
-
+    page_obj, pagination_range = make_pagination(request, recipes, PER_PAGE)
     return render(request, 'recipes/pages/category.html',
-                  context={'recipes': recipes,
+                  context={'recipes': page_obj,
+                           'pagination_range': pagination_range,
                            'title': f'{recipes[0].category.name} - Category | '
                            })
 
@@ -124,11 +113,13 @@ def search(request):
         is_published=True
         ).order_by('-id')  # ordenado do id maior para o menor ou seja , pela logica os ultimos a serem criados vao aparecer primeiro # noqa:E501
     # apos a cada criação adiciona +1 ao maior id que será para o proxima receita # noqa:E501
-
+    page_obj, pagination_range = make_pagination(request, recipes, PER_PAGE)
     return render(request, 'recipes/pages/search.html', {
         # o valor da variavel page_title(no template em pages search.html) recebe essa string # noqa:E501
         #  + o valor do search_term (value do imput na partial search.html)  # noqa:E501
         'page_title': f'Search for "{search_term}" |',
         'search_term': search_term,
-        'recipes': recipes,
+        'recipes': page_obj,
+        'pagination_range': pagination_range,
+        'additional_url_query': f'&q={search_term}',
                   })

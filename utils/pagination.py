@@ -1,8 +1,13 @@
+# python -c "import string as s;from random import SystemRandom as sr;print(''.join(sr().choices(s.ascii_letters + s.punctuation, k=64)))" # noqa:E501
+
+
 # sabendo que a fila de numeros de paginas começa a mudar a partir da página 3 usarmos uma condição if # noqa:E501
 
 
 # minha solução:
 import math
+
+from django.core.paginator import Paginator
 
 '''def make_pagination_range(
         page_range,
@@ -85,4 +90,26 @@ def make_pagination_range(
         'stop_range': stop_range,
         'first_page_out_of_range': current_page > middle_range,
         'last_page_out_of_range': stop_range < total_pages,
+        'current_page': current_page
     }
+
+
+def make_pagination(request, queryset, per_page, qty_pages=4):
+    try:
+        current_page = int(request.GET.get('page', 1))  # <-pega a query string, se nao tiver nada ele pega a página 1 # noqa:E501
+        # e transforma ela em inteiro caso ela seja lida como string
+    except ValueError:
+        current_page = 1
+
+    # vamos criar um objeto Paginator e como argumentos usamos a variabel recipes (que filtrou)  # noqa:E501
+    # resultados especificos e a quantidade de receitas por pagina paginas
+    paginator = Paginator(queryset, per_page)
+    page_obj = paginator.get_page(current_page)
+
+    # Vamos criar uma variacel
+    pagination_range = make_pagination_range(
+        paginator.page_range,
+        qty_pages,
+        current_page=current_page,
+    )
+    return page_obj, pagination_range

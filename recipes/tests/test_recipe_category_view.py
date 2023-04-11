@@ -19,7 +19,7 @@ class RecipeCategoryViewTest(RecipeTestBase):
         self.assertIs(view.func, views.category)
 
     def test_recipe_category_view_returns_404_if_no_recipes_found(self):  # noqa:E501
-        # client serve para simular um usuario que irá fazer um request na url especificada # noqa:E501
+        # client serve para simular um usuario que irá fazer um request na url especificada # noqa:E501conte
         response = self.client.get(
             reverse('recipes:category', kwargs={'category_id': 100000}))
         # status_code é uma informação que temos na variavel response, ela pode ser verificada fazendo o debug com break point # noqa:E501
