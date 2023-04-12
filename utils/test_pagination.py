@@ -1,14 +1,19 @@
 # Apesar de ter o mesmo nome da classe que importamos do django.test
 # essa classe importada do unittes éum pouco mais simples nos asserts
+import os
 from unittest import TestCase
+from unittest.mock import patch  # usamos para mudar valores de variaveis
 
 from django.urls import reverse
 
+from recipes import views  # noqa:F401
+from recipes.tests.test_recipe_base import RecipeTestBase
+from utils.pagination import make_pagination_range
+
+PER_PAGE = int(os.environ.get('PER_PAGE', 6))
 # queremos que os numeros das paginas fiquem como no google, exemplo: 1 2 3 4 e a pagina que estamos em azul, e que ela avance para 5  # noqa:E501
 # quando a pagina atual for 3 e assim m por diante até a pagina 20 , onde na pagina 19 e 20 deve-se obter 17,18,19,20 pois nosso range é de 20  # noqa:E501
 # paginas entao nao é possivel avançar, enfimfrom recipes import views, vamos testar essa logica  # noqa:E501
-from recipes.tests.test_recipe_base import RecipeTestBase
-from utils.pagination import make_pagination_range
 
 
 class PaginationTest(TestCase):
@@ -86,7 +91,7 @@ class PaginationTests(RecipeTestBase):
     def test_pagination_max_9_recipes_por_page(self):
         list_recipes = []
         # looping para criar varias receitas, no caso 16
-        for x in range(0, 15):
+        for x in range(0, PER_PAGE+6):
             x = self.make_recipe(title=f'recipe0{str(x)}', slug=str(
                 x), author_data={'username': f'{str(x)}'})
             list_recipes.append(x.title)
@@ -102,17 +107,17 @@ class PaginationTests(RecipeTestBase):
         # assim podemos ter certeza que temos mais de uma página de receitas.
         # Codigo comentado abaixo serve para fazer o teste falhar.
         # self.assertGreater(total_recipes_created, 20)
-        self.assertGreater(total_recipes_created, 9)
+        self.assertGreater(total_recipes_created, PER_PAGE)
         # Abaixo verificamos se o número de receitas exibidos tem o máximo de 9 por página # noqa:E501
         # Para testar o código abaixo basta ir na view home e alterar o valor de PER_PAGES para mais ou para menos de 9 em make_pagination # noqa:E501
-        self.assertEqual(total_recipes_showed_in_the_page, 9)
+        self.assertEqual(total_recipes_showed_in_the_page, PER_PAGE)
 
     def test_pagination_less_than_9_recipes_per_page(self):
         # Vamos testar se quando tivermos um numero de receitas menor que o máximo por página(geralmente a ultima página) # noqa:E501
         # o numero correto será exibido
         # looping para criar 4 receitas
         list_recipes = []
-        for x in range(0, 4):
+        for x in range(0, PER_PAGE-5):
             x = self.make_recipe(title=f'recipe0{str(x)}', slug=str(
                 x), author_data={'username': f'{str(x)}'})
             list_recipes.append(x.title)
@@ -122,10 +127,35 @@ class PaginationTests(RecipeTestBase):
         # variavel com o total de receitas criado
         content = response.content.decode('utf-8')
         # Para fazer falhar o codigo abaixo basta alterar na view home o valor de  PER_PAGES para 4 ou mais # noqa:E501
-        self.assertLess(total_recipes_created, 9)
+        self.assertLess(total_recipes_created, PER_PAGE)
         # Código comentado abaixo para fazer o teste falhar pois sabemos que 'Recipetest' não esta contido no conteudo # noqa:E501
         # list_recipes.append('Recipetest')
 
         # Abaixo criamos um Looping para verificar se cada receita(valor do titulo) é encontrado no content # noqa:E501
         for recipe in list_recipes:
             self.assertIn(recipe, content)
+        # SOLUÇÂO DO PROFESSOR PARA TESTAR PAGINATION
+
+    # No codigo abaixo é onde alteramos o valor da variavel, indicando o caminho o nome e o novo valor da mesma # noqa:E501
+    # @patch('recipes.views.PER_PAGE', new=3)
+    # existe uma outra maneira de fazer o mesmo com with patch
+    def test_recipe_home_is_paginated(self):
+
+        for i in range(8):
+            kwargs = {'slug': f'r{i}',
+                      'author_data': {'username': f'u{i}'}}
+            # Usamos **kwargs quando temos elementos com chave e valor (dicionario) # noqa:E501
+            self.make_recipe(**kwargs)
+        # fazemos uma gambiarra para alter o valor da variavel que a view usa
+        with patch('recipes.views.PER_PAGE', new=3):
+            response = self.client.get(reverse('recipes:home'))
+            # O django cria uma variavel paginator no response.context['recipes'] # noqa:E501
+            recipes = response.context['recipes']
+            paginator = recipes.paginator
+            # em paginator temos a variavel num_pages (numero de páginas)
+            self.assertEqual(paginator.num_pages, 3)
+            # vamos testar se na pagina 1 e 2 temos 3 receitas em cada uma e na pagina 3 temos 2 receitas, # noqa:E501
+            # totalizando as 8 criadas
+            self.assertEqual(len(paginator.get_page(1)), 3)
+            self.assertEqual(len(paginator.get_page(2)), 3)
+            self.assertEqual(len(paginator.get_page(3)), 2)
