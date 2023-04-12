@@ -14,6 +14,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
+from django.contrib.messages import \
+    constants  # Importamos esse modulo para configurar as mensagens flash
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -136,3 +139,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# from django.contrib.messages import constants #Importamos esse modulo para configurar as mensagens flash # noqa:E501
+MESSAGE_TAGS = {
+    # os valores das variaveis são a classe que vamos usar no css para estilizar as menssagens # noqa:E501
+    constants.DEBUG: 'message-debug',
+    constants.ERROR: 'message-error',
+    constants.INFO: 'message-info',
+    constants.SUCCESS: 'message-success',
+    constants.WARNING: 'message-warning',
+
+}

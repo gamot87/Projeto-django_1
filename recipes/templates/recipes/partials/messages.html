@@ -1,0 +1,13 @@
+{% if messages %}
+    <div class="main-content center container messages-container">
+        {% for message in messages %} <!--busca se existem mensagens e exibe independetemente de qual view a variavel message foi criada-->
+        
+        <!--a variavel message.tags ja puxa da view qual comando imprime a mensagem no caso é sucess() entao automaticamente ela puxa o 
+        estilo no css da classe criada no arquivo settings -->
+            <div class="message {{ message.tags }}"> 
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+{% endif %}

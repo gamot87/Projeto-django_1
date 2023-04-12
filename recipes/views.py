@@ -5,6 +5,8 @@
 # Para indicar o django que queremos OR ao inves de AND
 import os  # Para permitir o uso de variaveis de ambiente
 
+# importa um modulo que permite enviar mensagens ao usuario atraves das views # noqa:E501
+from django.contrib import messages
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -24,6 +26,7 @@ PER_PAGE = int(os.environ.get('PER_PAGE', 6))
 
 
 def home(request):
+
     # Abaixo estamos criando uma variavel com o comando sheel que vai filtrar as receitar de  # noqa:E501
     # acordo com a variavel is_published e listar todas em ordem decrescente ou seja quanto  # noqa:E501
     # mais recente primeiro sera relacionada
@@ -36,7 +39,13 @@ def home(request):
     recipes = Recipe.objects.filter(
         is_published=True,
     ).order_by('-id')
+    # Codigo abaixo é um exemplo de como enviar mensagens ao usuario
+    messages.success(request, 'Epa você foi pesquisar que eu vi.')
+    messages.error(request, 'Epa você foi pesquisar que eu vi.')
+    messages.info(request, 'Epa você foi pesquisar que eu vi.')
+
     page_obj, pagination_range = make_pagination(request, recipes, PER_PAGE)
+
     return render(request, 'recipes/pages/home.html',
                   context={'recipes': page_obj,
                            'pagination_range': pagination_range,
@@ -87,6 +96,7 @@ def recipe(request, id):
 
 
 def search(request):
+
     # vamos capturar o valor (q) digitado no input do search
     # caso nao tenha valor ele retorna None
     search_term = request.GET.get('q', "").strip()  # .strip remove espaços laterais seja na esquerda ou direita # noqa:E501
