@@ -6,7 +6,7 @@
 import os  # Para permitir o uso de variaveis de ambiente
 
 # importa um modulo que permite enviar mensagens ao usuario atraves das views # noqa:E501
-from django.contrib import messages
+from django.contrib import messages  # noqa:F401
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -40,9 +40,9 @@ def home(request):
         is_published=True,
     ).order_by('-id')
     # Codigo abaixo é um exemplo de como enviar mensagens ao usuario
-    messages.success(request, 'Epa você foi pesquisar que eu vi.')
-    messages.error(request, 'Epa você foi pesquisar que eu vi.')
-    messages.info(request, 'Epa você foi pesquisar que eu vi.')
+    # messages.success(request, 'Epa você foi pesquisar que eu vi.')
+    # messages.error(request, 'Epa você foi pesquisar que eu vi.')
+    # messages.info(request, 'Epa você foi pesquisar que eu vi.')
 
     page_obj, pagination_range = make_pagination(request, recipes, PER_PAGE)
 

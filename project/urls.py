@@ -20,7 +20,9 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('recipes.urls'))
+    path('', include('recipes.urls')),
+    # significa que a url vai ficar http://127.0.0.1:8000/authors/ como sendo a raiz # noqa:E501
+    path('authors/', include('authors.urls'))
 
 ]
 

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Devemos informar o nosso app pelo nome que damos a ele no arquivo apps.py
-    'recipes'
+    'recipes',
+    'authors',
 ]
 
 MIDDLEWARE = [
